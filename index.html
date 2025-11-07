@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>File Expiry Tracker</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .expired { background-color: #ffe0e0; }
+    .warning { background-color: #fff8dc; }
+  </style>
+</head>
+<body>
+  <h1>📁 File Expiry Tracker</h1>
+  <form id="fileForm">
+    <input type="text" id="fileName" placeholder="File name" required />
+    <input type="date" id="fileDate" required />
+    <button type="submit">Add File</button>
+  </form>
+  <table border="1" cellpadding="5" id="fileTable">
+    <thead>
+      <tr><th>Name</th><th>Created</th><th>Expires</th><th>Status</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('fileForm');
+    const tableBody = document.querySelector('#fileTable tbody');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('fileName').value;
+      const date = new Date(document.getElementById('fileDate').value);
+      const expiry = new Date(date);
+      expiry.setMonth(expiry.getMonth() + 6);
+
+      const today = new Date();
+      const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+      let status = '';
+      let rowClass = '';
+
+      if (diffDays <= 0) {
+        status = 'Expired';
+        rowClass = 'expired';
+      } else if (diffDays <= 30) {
+        status = `Expiring in ${diffDays} days`;
+        rowClass = 'warning';
+      } else {
+        status = `Valid (${diffDays} days left)`;
+      }
+
+      const row = document.createElement('tr');
+      row.className = rowClass;
+      row.innerHTML = `<td>${name}</td><td>${date.toDateString()}</td><td>${expiry.toDateString()}</td><td>${status}</td>`;
+      tableBody.appendChild(row);
+
+      form.reset();
+    });
+  </script>
+</body>
+</html>
